@@ -1,20 +1,21 @@
 require('dotenv').config();
-import express, { json } from 'express';
-import { createConnection } from 'mysql2';
-import cors from 'cors';
+const express = require('express');
+const mysql = require('mysql'); // or 'mysql' if you're not using mysql2
+const cors = require('cors');
+
 const app = express();
 
 app.use(cors());
-app.use(json());
+app.use(express.json());
 
 // Load from env variables
-const db = createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: parseInt(process.env.DB_PORT)
-  });
+const db = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: parseInt(process.env.DB_PORT)
+});
 
 db.connect(err => {
   if (err) console.error('DB Error: ', err);
@@ -30,10 +31,14 @@ app.get('/notes', (req, res) => {
 
 app.post('/notes', (req, res) => {
   const { title, content } = req.body;
-  db.query('INSERT INTO notes (title, content) VALUES (?, ?)', [title, content], (err, result) => {
-    if (err) return res.status(500).send(err);
-    res.send({ id: result.insertId, title, content });
-  });
+  db.query(
+    'INSERT INTO notes (title, content) VALUES (?, ?)',
+    [title, content],
+    (err, result) => {
+      if (err) return res.status(500).send(err);
+      res.send({ id: result.insertId, title, content });
+    }
+  );
 });
 
 app.listen(3000, () => {
