@@ -1,17 +1,14 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
+require('dotenv').config();
+import express, { json } from 'express';
+import { createConnection } from 'mysql2';
+import cors from 'cors';
 const app = express();
 
 app.use(cors());
-app.use(express.json());
-DB_HOST=turntable.proxy.rlwy.net
-DB_PORT=23751
-DB_USER=root
-DB_PASSWORD=jSEVGPPByWdDakKGjQqMVzBKoJHsAlXq
-DB_NAME=railway
+app.use(json());
+
 // Load from env variables
-const db = mysql.createConnection({
+const db = createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
