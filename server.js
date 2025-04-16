@@ -1,19 +1,20 @@
-// Load environment variables first
 require('dotenv').config();
-
-// Import required modules
 const express = require('express');
-const cors = require('cors');
 const mysql = require('mysql');
+const cors = require('cors');
 
-// Initialize Express app
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Setup MySQL connection using env variables
+// Root route for testing
+app.get('/', (req, res) => {
+  res.send('📝 Notes API is running!');
+});
+
+// MySQL database connection
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -22,16 +23,15 @@ const db = mysql.createConnection({
   port: parseInt(process.env.DB_PORT)
 });
 
-// Connect to DB
 db.connect(err => {
   if (err) {
-    console.error('❌ DB Connection Error:', err);
+    console.error('DB Error: ', err);
   } else {
     console.log('✅ Connected to MySQL');
   }
 });
 
-// Routes
+// GET all notes
 app.get('/notes', (req, res) => {
   db.query('SELECT * FROM notes', (err, results) => {
     if (err) return res.status(500).send(err);
@@ -39,6 +39,7 @@ app.get('/notes', (req, res) => {
   });
 });
 
+// POST a new note
 app.post('/notes', (req, res) => {
   const { title, content } = req.body;
   db.query(
@@ -51,8 +52,7 @@ app.post('/notes', (req, res) => {
   );
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+// Start server
+app.listen(3000, () => {
+  console.log('🚀 Server running on port 3000');
 });
