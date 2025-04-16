@@ -1,14 +1,19 @@
+// Load environment variables first
 require('dotenv').config();
-const express = require('express');
-const mysql = require('mysql'); // or 'mysql' if you're not using mysql2
-const cors = require('cors');
 
+// Import required modules
+const express = require('express');
+const cors = require('cors');
+const mysql = require('mysql');
+
+// Initialize Express app
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Load from env variables
+// Setup MySQL connection using env variables
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
@@ -17,11 +22,16 @@ const db = mysql.createConnection({
   port: parseInt(process.env.DB_PORT)
 });
 
+// Connect to DB
 db.connect(err => {
-  if (err) console.error('DB Error: ', err);
-  else console.log('Connected to MySQL');
+  if (err) {
+    console.error('❌ DB Connection Error:', err);
+  } else {
+    console.log('✅ Connected to MySQL');
+  }
 });
 
+// Routes
 app.get('/notes', (req, res) => {
   db.query('SELECT * FROM notes', (err, results) => {
     if (err) return res.status(500).send(err);
@@ -41,6 +51,8 @@ app.post('/notes', (req, res) => {
   );
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
